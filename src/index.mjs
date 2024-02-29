@@ -34,7 +34,7 @@ app.get("/api/users/:id", (req, resp)=>{
     const id = req.params.id;
     console.log("The id is " +id);
     if(!id) {
-        resp.set(400).send({msg:"Bad request, \\n Invalid user id"});
+        resp.set(400).send({msg:"Bad request",description:" Invalid user id"});
     }
     const user = users.find((usr) => usr.user === id);
     if(user) {
@@ -43,7 +43,7 @@ app.get("/api/users/:id", (req, resp)=>{
             user
         );
     }else {
-        resp.set(400).send({msg:"Bad request, \\n User not found"});
+        resp.set(400).send({msg:"Bad request" , description: " User not found"});
     }
     
 });
