@@ -1,4 +1,4 @@
-import express from "express";
+import express, { query } from "express";
 import { json } from "express";
 
 const app = express();
@@ -12,10 +12,13 @@ app.listen(PORT, ()=>{
 });
 /*Data setup*/ 
 const users = [
-    { "user": "mahmed", "dept": "tech" },
-    { "user": "kraaj",  "dept": "hr" },
-    { "user": "jsmith", "dept": "accts"},
-    { "user": "kzinto", "dept": "accts"}
+    { id:1,username: "mahmed", dept: "tech" },
+    { id:2,username: "jPeralta", dept: "tech" },
+    { id:3,username: "aKhan", dept: "tech" },
+    { id:4,username: "mJadoon", dept: "tech" },
+    { id:5,username: "kraaj",  dept: "hr" },
+    { id:6,username: "jsmith", dept: "accts"},
+    { id:7,username: "kzinto", dept: "accts"}
 ]
 /*Routes definitions*/
 app.get("/api/greet", (request, response)=> {
@@ -23,11 +26,18 @@ app.get("/api/greet", (request, response)=> {
 });
 
 app.get("/api/users", (req, resp)=>{
-    let usersAre = JSON.stringify(users);
+    console.log("The querystring is: "+JSON.stringify(req.query));
+    //Query object is parsed as a json object by node js. We can easily destructure this use destructure syntax
+    const{
+        query: {filter, value}
+    } = req;
+    //Printing parsed values
+    console.log(`Parsed object is filter { filter: ${filter}, value: ${value}}`);
+    if(!filter && !value) {
+        resp.set(400).send({msg:"Bad request", description: "Filter and value should be provided"});
+    }
     resp.set(200)
-        .send(
-            `<h1> ${usersAre} </h1>`
-        );
+        .send(users);
 });
 
 app.get("/api/users/:id", (req, resp)=>{
@@ -36,7 +46,7 @@ app.get("/api/users/:id", (req, resp)=>{
     if(!id) {
         resp.set(400).send({msg:"Bad request",description:" Invalid user id"});
     }
-    const user = users.find((usr) => usr.user === id);
+    const user = users.find((usr) => usr.id == id);
     if(user) {
         resp.set(200)
         .send(
