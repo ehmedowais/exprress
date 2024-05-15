@@ -1,17 +1,16 @@
-import express, { query } from "express";
-import { json } from "express";
-
+import express from "express";
+import bodyParser from "body-parser";
 const app = express();
 
 const PORT = process.env.PORT || 3000;
-
+app.use(bodyParser.json());
 
 
 app.listen(PORT, ()=>{
     console.log(`Listining on port ${PORT}`);
 });
 /*Data setup*/ 
-const users = [
+var users = [
     { id:1,username: "mahmed", dept: "tech" },
     { id:2,username: "jPeralta", dept: "tech" },
     { id:3,username: "aKhan", dept: "tech" },
@@ -22,7 +21,8 @@ const users = [
 ]
 /*Routes definitions*/
 app.get("/api/greet", (request, response)=> {
-    response.send("<H1> hello </H1");
+    response.appendHeader("content-type", "text/html");
+    response.send("<H1> hello </H1>");
 });
 
 app.get("/api/users", (req, resp)=>{
@@ -44,16 +44,36 @@ app.get("/api/users/:id", (req, resp)=>{
     const id = req.params.id;
     console.log("The id is " +id);
     if(!id) {
-        resp.set(400).send({msg:"Bad request",description:" Invalid user id"});
+        resp.status(400).send({msg:"Bad request",description:" Invalid user id"});
     }
     const user = users.find((usr) => usr.id == id);
     if(user) {
-        resp.set(200)
+        resp.status(200)
         .send(
             user
         );
     }else {
         resp.set(400).send({msg:"Bad request" , description: " User not found"});
     }
+    
+});
+
+app.post("/api/users/user", (req, resp) => {
+    const data = req.body;
+    if(data)
+        console.log(data);
+    else {
+        resp.status(400).send("Invalid data item")
+    }
+    const existingUsr = users.find(user => user.id === data.id);
+    if(data && !existingUsr){
+        users.push(data);
+        resp.status(201).send(data);
+    }else {
+        resp.status(400).send("User already exist " );
+    }
+    
+    
+    //const usr1 = users.find(data.id);
     
 });
